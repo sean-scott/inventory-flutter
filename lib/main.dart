@@ -48,6 +48,24 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
+  void _openPage() {
+    Navigator.of(context).push(new MaterialPageRoute(
+      builder: (BuildContext context){
+        return new Scaffold(
+          appBar: new AppBar(title: new Text('My Page')),
+          body: new Center(
+            child: new FlatButton(
+              child: new Text('POP'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+        );
+      },
+    ));
+  }
+
   void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that
@@ -81,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _openPage,
         tooltip: 'Increment',
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
