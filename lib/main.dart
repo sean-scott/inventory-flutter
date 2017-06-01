@@ -46,36 +46,68 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   void _openPage() {
     Navigator.of(context).push(new MaterialPageRoute(
       builder: (BuildContext context){
         return new Scaffold(
-          appBar: new AppBar(title: new Text('My Page')),
-          body: new Center(
-            child: new FlatButton(
-              child: new Text('POP'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          appBar: new AppBar(
+            title: new Text('Add Item'),
+            actions: <Widget>[
+              new IconButton(
+                icon: new Icon(Icons.done),
+                tooltip: 'Save',
+                onPressed: null,
+              ),
+            ],
+          ),
+          body: new Container(
+            child: new ListView(
+              padding: const EdgeInsets.all(16.0),
+              children: [
+                new TextFormField(
+                  decoration: new InputDecoration(
+                    labelText: 'Name'
+                  ),
+                ),
+                new TextFormField(
+                  keyboardType: TextInputType.datetime,
+                  decoration: new InputDecoration(
+                    labelText: 'Date Purchased'
+                  ),
+                ),
+                new TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration: new InputDecoration(
+                    labelText: 'Quantity'
+                  ),
+                ),
+                new TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration: new InputDecoration(
+                    labelText: 'Value (\$)'
+                  ),
+                ),
+                new TextFormField(
+                  decoration: new InputDecoration(
+                    labelText: 'Location'
+                  ),
+                ),
+                new TextFormField(
+                  decoration: new InputDecoration(
+                    labelText: 'Category'
+                  ),
+                ),
+                new TextFormField(
+                  decoration: new InputDecoration(
+                    labelText: 'Notes'
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
     ));
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that
-      // something has changed in this State, which causes it to rerun
-      // the build method below so that the display can reflect the
-      // updated values. If we changed _counter without calling
-      // setState(), then the build method would not be called again,
-      // and so nothing would appear to happen.
-      _counter++;
-    });
   }
 
   @override
@@ -92,11 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // was created by the App.build method, and use it to set
         // our appbar title.
         title: new Text(widget.title),
-      ),
-      body: new Center(
-        child: new Text(
-          'Button tapped $_counter time${ _counter == 1 ? '' : 's' }.',
-        ),
       ),
       floatingActionButton: new FloatingActionButton(
         onPressed: _openPage,
