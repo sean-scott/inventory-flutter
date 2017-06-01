@@ -1,15 +1,36 @@
 import 'package:flutter/material.dart';
 
+import 'item_data.dart';
+
 class ItemPage extends StatefulWidget {
-  ItemPage({Key key, this.title}) : super(key: key);
+  ItemPage({Key key, this.title, this.item}) : super(key: key);
 
   final String title;
+  final Item item;
 
   @override
   _ItemPageState createState() => new _ItemPageState();
 }
 
 class _ItemPageState extends State<ItemPage> {
+  Item item = new Item();
+  final TextEditingController _nameController = new TextEditingController();
+
+  void _save() {
+    item.name = _nameController.text;
+
+    Inventory.save(item);
+    // if success
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    item.id = widget.item.id;
+    _nameController.text = widget.item.name;
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -19,7 +40,7 @@ class _ItemPageState extends State<ItemPage> {
           new IconButton(
             icon: new Icon(Icons.done),
             tooltip: 'Save',
-            onPressed: null,
+            onPressed: _save,
           ),
         ],
       ),
@@ -28,8 +49,9 @@ class _ItemPageState extends State<ItemPage> {
           padding: const EdgeInsets.all(16.0),
           children: [
             new TextFormField(
+              controller: _nameController,
               decoration: new InputDecoration(
-                labelText: 'Name'
+                labelText: 'Name',
               ),
             ),
             new TextFormField(
@@ -70,5 +92,4 @@ class _ItemPageState extends State<ItemPage> {
       ),
     );
   }
-
 }
