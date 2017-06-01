@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'item_page.dart';
+
 void main() {
   runApp(new MyApp());
 }
@@ -23,6 +25,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.brown,
       ),
       home: new MyHomePage(title: 'Inventory'),
+      routes: <String, WidgetBuilder> {
+        '/new_item': (BuildContext context) => new ItemPage(title: 'Add Item'),
+      }
     );
   }
 }
@@ -47,67 +52,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   void _openPage() {
-    Navigator.of(context).push(new MaterialPageRoute(
-      builder: (BuildContext context){
-        return new Scaffold(
-          appBar: new AppBar(
-            title: new Text('Add Item'),
-            actions: <Widget>[
-              new IconButton(
-                icon: new Icon(Icons.done),
-                tooltip: 'Save',
-                onPressed: null,
-              ),
-            ],
-          ),
-          body: new Container(
-            child: new ListView(
-              padding: const EdgeInsets.all(16.0),
-              children: [
-                new TextFormField(
-                  decoration: new InputDecoration(
-                    labelText: 'Name'
-                  ),
-                ),
-                new TextFormField(
-                  keyboardType: TextInputType.datetime,
-                  decoration: new InputDecoration(
-                    labelText: 'Date Purchased'
-                  ),
-                ),
-                new TextFormField(
-                  keyboardType: TextInputType.number,
-                  decoration: new InputDecoration(
-                    labelText: 'Quantity'
-                  ),
-                ),
-                new TextFormField(
-                  keyboardType: TextInputType.number,
-                  decoration: new InputDecoration(
-                    labelText: 'Value (\$)'
-                  ),
-                ),
-                new TextFormField(
-                  decoration: new InputDecoration(
-                    labelText: 'Location'
-                  ),
-                ),
-                new TextFormField(
-                  decoration: new InputDecoration(
-                    labelText: 'Category'
-                  ),
-                ),
-                new TextFormField(
-                  decoration: new InputDecoration(
-                    labelText: 'Notes'
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    ));
+    Navigator.of(context).pushNamed('/new_item');
   }
 
   @override
