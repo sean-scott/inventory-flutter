@@ -11,6 +11,12 @@ class InventoryApp extends StatefulWidget {
 
 class InventoryAppState extends State<InventoryApp> {
 
+  @override
+  void initState() {
+    super.initState();
+    Inventory.load();
+  }
+
   Route<Null> _getRoute(RouteSettings settings) {
     final List<String> path = settings.name.split('/');
     if (path[0] != '')

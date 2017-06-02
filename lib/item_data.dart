@@ -60,12 +60,15 @@ class Inventory {
   // retrieves all items
   static List<Item> toList() {
     List<Item> list = new List<Item>();
-
-    for (String key in data.keys){
-      var id = int.parse(key, onError: (key) => null);
-      if (id != null){
-        list.add(get(id));
+    try {
+      for (String key in data.keys){
+        var id = int.parse(key, onError: (key) => null);
+        if (id != null){
+          list.add(get(id));
+        }
       }
+    } catch (exception) {
+      print(exception);
     }
 
     return list;
