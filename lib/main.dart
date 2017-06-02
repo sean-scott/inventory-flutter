@@ -1,83 +1,56 @@
 import 'package:flutter/material.dart';
 
 import 'item_data.dart';
-import 'item_list.dart';
+import 'item_home.dart';
 import 'item_page.dart';
 
-void main() {
-  runApp(new MyApp());
+class InventoryApp extends StatefulWidget {
+  @override
+  InventoryAppState createState() => new InventoryAppState();
 }
 
-class MyApp extends StatelessWidget {
+class InventoryAppState extends State<InventoryApp> {
 
+  Route<Null> _getRoute(RouteSettings settings) {
+    final List<String> path = settings.name.split('/');
+    if (path[0] != '')
+      return null;
+    if (path[1] == 'item') {
+      if (path.length != 3)
+        return null;
+      if (path[2] == '-1'){ // new item
+        return new MaterialPageRoute<Null>(
+          settings: settings,
+          builder: (BuildContext context) => new ItemPage(title: 'Add Item', item: Inventory.get(-1))
+        );
+      } else { // old item
+        var id = int.parse(path[2], onError: (source) => null);
+        if (id != null) {
+          return new MaterialPageRoute<Null>(
+            settings: settings,
+            builder: (BuildContext context) => new ItemPage(title: 'Edit Item', item: Inventory.get(id))
+          );
+        }
+      }
+    }
+    return null;
+  }
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: 'Inventory',
       theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting
-        // the app, try changing the primarySwatch below to Colors.green
-        // and then invoke "hot reload" (press "r" in the console where
-        // you ran "flutter run", or press Run > Hot Reload App in IntelliJ).
-        // Notice that the counter didn't reset back to zero -- the application
-        // is not restarted.
         primarySwatch: Colors.brown,
       ),
-      home: new MyHomePage(title: 'Inventory'),
       routes: <String, WidgetBuilder> {
-        '/new_item': (BuildContext context) => new ItemPage(title: 'Add Item', item: Inventory.get(-1)),
+        '/': (BuildContext context) => new ItemHome()
       },
+      onGenerateRoute: _getRoute,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful,
-  // meaning that it has a State object (defined below) that contains
-  // fields that affect how it looks.
-
-  // This class is the configuration for the state. It holds the
-  // values (in this case the title) provided by the parent (in this
-  // case the App widget) and used by the build method of the State.
-  // Fields in a Widget subclass are always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  void _openPage() {
-    Navigator.of(context).pushNamed('/new_item');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Retrieve list of items
-    Inventory.load();
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-      ),
-      body: new ItemList(
-        items: Inventory.toList(),
-        onAction: null,
-        onOpen: null,
-        onShow: null,
-      ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _openPage,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ),
-    );
-  }
+void main() {
+  runApp(new InventoryApp());
 }

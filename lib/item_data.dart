@@ -2,21 +2,6 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
-/*
-  items.json will look like
-
-  {
-    "0": {
-      "id": 0,
-      "name": "Foo"
-    },
-    "23": {
-      "id": 23,
-      "name": "Bar"
-    }
-  }
-
- */
 
 class Item {
   int id = -1;
