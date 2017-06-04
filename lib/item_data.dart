@@ -2,12 +2,13 @@ import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Item {
   int id = -1;
   String name;
 
-  String toString(){
+  String toString() {
     return 'id: ' + this.id.toString() + '\n' +
            'name: ' + this.name;
   }
@@ -15,97 +16,79 @@ class Item {
 
 // collection of all items
 class Inventory {
-  static Map data;
+  static Database itemsDB;
 
-  // gets map of all items
-  static Future<bool> load() async {
-    try {
-      File file = await _getLocalFile();
-      // read the variable as a string from the file.
-      String contents = await file.readAsString();
-      print("LOADED: " + contents);
-      data = JSON.decode(contents);
-      return true;
-    } on FileSystemException {
-      init();
-      return false;
+  // gets the database path
+  static Future<String> getDatabasePath(String filename) async {
+    String dir = (await getApplicationDocumentsDirectory()).path;
+    File file = new File('$dir/$filename');
+    return file.path;
+  }
+
+  // creates or opens the database and assigns it to `itemsDB`
+  static Future load() async {
+    print("Loading database...");
+    String path = await getDatabasePath("items.db");
+    itemsDB = await openDatabase(path, version: 1,
+      onCreate: (Database db, int version) async {
+        print("Creating itemsDB...");
+        await db.execute(
+          "CREATE TABLE Items (id INTEGER PRIMARY KEY, name TEXT)"
+        );
+      },
+    );
+  }
+
+  // saves a new item or updates an existing one
+  static Future save(Item item) async {
+    print("Saving Item '${item.name}' to database...");
+    if (item.id == -1) { // insert
+      await itemsDB.inTransaction(() async {
+        await itemsDB.insert(
+          'INSERT INTO Items(name) VALUES(?)', [item.name]
+        );
+      });
+    } else { // update
+      await itemsDB.update(
+        'UPDATE Items SET name = ? WHERE id = ?', [item.name, item.id]
+      );
     }
   }
 
-  // creates items.json with a max_id value set to -1
-  static Future<Null> init() async {
-    //print('Initializing items.json...');
-    data = new Map();
-    data.putIfAbsent('max_id', () => -1);
-    String json = JSON.encode(data);
-    await (await _getLocalFile()).writeAsString('$json');
-  }
-
-  // retrieves an item
-  static Item get(int id) {
+  // converts map to item object
+  static Item _getItemFromMap(Map map) {
     Item item = new Item();
-    if (id != -1){
-      try {
-        Map jsonItem = Inventory.data[id.toString()];
-        item.id = jsonItem["id"];
-        item.name = jsonItem["name"];
-      } catch (exception){
-        print(exception);
-      }
-    }
-
+    item.id = map["id"];
+    item.name = map["name"];
     return item;
   }
 
-  // retrieves all items
-  static List<Item> toList() {
-    List<Item> list = new List<Item>();
-    try {
-      for (String key in data.keys){
-        var id = int.parse(key, onError: (key) => null);
-        if (id != null){
-          list.add(get(id));
-        }
-      }
-    } catch (exception) {
-      print(exception);
+  // gets all items in database
+  static Future<List<Item>> getItems() async {
+    print("Getting all items from database...");
+    List<Item> items = new List<Item>();
+    if (itemsDB == null){
+      print("Can't find database!");
+      await load();
+    }
+    List<Map> map = await itemsDB.query('SELECT * FROM Items');
+    for (int i = 0; i < map.length; i++) {
+      items.add(_getItemFromMap(map[i]));
     }
 
-    return list;
+    return items;
   }
 
-  // saves an item to the inventory
-  static Future<Null> save(Item item) async {
-    // assign ID
-    if (item.id == -1){
-      item.id = data['max_id'] + 1;
-      int maxId = data.putIfAbsent('max_id', () => -1);
-      data.remove('max_id');
-      maxId++;
-      data.putIfAbsent('max_id', () => maxId);
-    }
-
-    // convert item into map
-    Map itemMap = new Map();
-    itemMap.putIfAbsent('id', () => item.id);
-    itemMap.putIfAbsent('name', () => item.name);
-
-    // put it in inventory and save
-    data.putIfAbsent(item.id.toString(), () => itemMap);
-    String json = JSON.encode(data);
-    await (await _getLocalFile()).writeAsString('$json');
+  // gets an item by id
+  static Future<Item> get(int id) async {
+    List<Map> map = await itemsDB.query('SELECT * FROM Items WHERE id = ?', [id]);
+    return _getItemFromMap(map[0]);
   }
 
-  // deletes an item from the inventory
-  static Future<Null> remove(int id) async {
-    data.remove(id.toString());
-    String json = JSON.encode(data);
-    await (await _getLocalFile()).writeAsString('$json');
-  }
-
-  static Future<File> _getLocalFile() async {
-    // get the path to the document directory.
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    return new File('$dir/items.json');
+  // deletes an item by id
+  static Future delete(int id) async {
+    await itemsDB.delete(
+      'DELETE FROM Items WHERE id = ?', [id]
+    );
   }
 }

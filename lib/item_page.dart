@@ -1,12 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'item_data.dart';
 
 class ItemPage extends StatefulWidget {
-  ItemPage({Key key, this.title, this.item}) : super(key: key);
+  ItemPage({Key key, this.title, this.id}) : super(key: key);
 
   final String title;
-  final Item item;
+  final int id;
 
   @override
   _ItemPageState createState() => new _ItemPageState();
@@ -16,34 +17,68 @@ class _ItemPageState extends State<ItemPage> {
   Item item = new Item();
   final TextEditingController _nameController = new TextEditingController();
 
+  void _delete() {
+    Inventory.delete(widget.id);
+    Navigator.of(context).pop();
+  }
+
   void _save() {
     item.name = _nameController.text;
-
     Inventory.save(item);
-    // if success
     Navigator.of(context).pop();
+  }
+
+  void _getItem(int id) {
+    Inventory.get(id).then((onValue) => setState(() {
+      item = onValue;
+      _nameController.text = item.name;
+    }));
   }
 
   @override
   void initState() {
     super.initState();
-    item.id = widget.item.id;
-    _nameController.text = widget.item.name;
+    print("Viewing item with ID: ${widget.id}");
+    if (widget.id > -1) {
+      _getItem(widget.id);
+    }
+  }
+
+  Widget _buildNewItemAppBar() {
+    return new AppBar(
+      title: new Text(widget.title),
+      actions: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.done),
+          tooltip: 'Save',
+          onPressed: _save,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOldItemAppBar() {
+    return new AppBar(
+      title: new Text(widget.title),
+      actions: <Widget>[
+        new IconButton(
+          icon: new Icon(Icons.delete),
+          tooltip: 'Delete',
+          onPressed: _delete,
+        ),
+        new IconButton(
+          icon: new Icon(Icons.done),
+          tooltip: 'Save',
+          onPressed: _save,
+        ),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-        actions: <Widget>[
-          new IconButton(
-            icon: new Icon(Icons.done),
-            tooltip: 'Save',
-            onPressed: _save,
-          ),
-        ],
-      ),
+      appBar: (widget.id > -1) ? _buildOldItemAppBar() : _buildNewItemAppBar(),
       body: new Container(
         child: new ListView(
           padding: const EdgeInsets.all(16.0),

@@ -5,6 +5,8 @@ dependencies:
   flutter:
     sdk: flutter
   path_provider: "^0.2.1+1"
+  sqflite:
+   git: git://github.com/tekartik/sqflite
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
