@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'item_data.dart';
@@ -16,6 +15,7 @@ class ItemPage extends StatefulWidget {
 class _ItemPageState extends State<ItemPage> {
   Item item = new Item();
   final TextEditingController _nameController = new TextEditingController();
+  final TextEditingController _quantityController = new TextEditingController();
 
   void _delete() {
     Inventory.delete(widget.id);
@@ -24,6 +24,7 @@ class _ItemPageState extends State<ItemPage> {
 
   void _save() {
     item.name = _nameController.text;
+    item.quantity = int.parse(_quantityController.text);
     Inventory.save(item);
     Navigator.of(context).pop();
   }
@@ -31,7 +32,9 @@ class _ItemPageState extends State<ItemPage> {
   void _getItem(int id) {
     Inventory.get(id).then((onValue) => setState(() {
       item = onValue;
+      print("$item");
       _nameController.text = item.name;
+      _quantityController.text = item.quantity.toString();
     }));
   }
 
@@ -41,6 +44,8 @@ class _ItemPageState extends State<ItemPage> {
     print("Viewing item with ID: ${widget.id}");
     if (widget.id > -1) {
       _getItem(widget.id);
+    } else {
+      _quantityController.text = "1";
     }
   }
 
@@ -96,6 +101,7 @@ class _ItemPageState extends State<ItemPage> {
               ),
             ),
             new TextFormField(
+              controller: _quantityController,
               keyboardType: TextInputType.number,
               decoration: new InputDecoration(
                 labelText: 'Quantity'

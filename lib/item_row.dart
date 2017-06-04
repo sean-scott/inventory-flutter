@@ -9,15 +9,19 @@ class ItemRow extends StatelessWidget {
     this.item,
     this.onPressed,
     this.onDoubleTap,
-    this.onLongPress
+    this.onLongPress,
+    this.onIncreaseQuantity,
+    this.onDecreaseQuantity,
   }) : super(key: new ObjectKey(item));
 
   final Item item;
   final ItemRowActionCallback onPressed;
   final ItemRowActionCallback onDoubleTap;
   final ItemRowActionCallback onLongPress;
+  final ItemRowActionCallback onIncreaseQuantity;
+  final ItemRowActionCallback onDecreaseQuantity;
 
-  static const double kHeight = 79.0;
+  static const double kHeight = 150.0;
 
   GestureTapCallback _getHandler(ItemRowActionCallback callback) {
     return callback == null ? null : () => callback(item);
@@ -46,6 +50,21 @@ class ItemRow extends StatelessWidget {
                     child: new Text(
                       item.name
                     )
+                  ),
+                  new Column(
+                    children: <Widget>[
+                      new IconButton(
+                        icon: const Icon(Icons.keyboard_arrow_up),
+                        onPressed: _getHandler(onIncreaseQuantity),
+                      ),
+                      new Text(
+                        item.quantity.toString(),
+                      ),
+                      new IconButton(
+                        icon: const Icon(Icons.keyboard_arrow_down),
+                        onPressed: _getHandler(onDecreaseQuantity),
+                      ),
+                    ]
                   )
                 ]
               )

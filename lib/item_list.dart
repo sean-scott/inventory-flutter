@@ -4,12 +4,14 @@ import 'item_data.dart';
 import 'item_row.dart';
 
 class ItemList extends StatelessWidget {
-  const ItemList({Key key, this.items, this.onOpen, this.onShow, this.onAction}) : super(key: key);
+  const ItemList({Key key, this.items, this.onOpen, this.onShow, this.onAction, this.onQuantityUp, this.onQuantityDown}) : super(key: key);
 
   final List<Item> items;
   final ItemRowActionCallback onOpen;
   final ItemRowActionCallback onShow;
   final ItemRowActionCallback onAction;
+  final ItemRowActionCallback onQuantityUp;
+  final ItemRowActionCallback onQuantityDown;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,9 @@ class ItemList extends StatelessWidget {
           item: items[index],
           onPressed: onOpen,
           onDoubleTap: onShow,
-          onLongPress: onAction
+          onLongPress: onAction,
+          onIncreaseQuantity: onQuantityUp,
+          onDecreaseQuantity: onQuantityDown,
         );
       },
     );

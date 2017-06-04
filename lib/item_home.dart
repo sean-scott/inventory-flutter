@@ -20,6 +20,22 @@ class ItemHomeState extends State<ItemHome> {
     Navigator.of(context).pushNamed('/item/-1');
   }
 
+  void _increaseQuantity(Item item) {
+    setState(() {
+      item.quantity++;
+    });
+    Inventory.save(item);
+  }
+
+  void _decreaseQuantity(Item item) {
+    setState(() {
+      if (item.quantity > 0) {
+        item.quantity--;
+      }
+    });
+    Inventory.save(item);
+  }
+
   void _handleSearchBegin() {
     ModalRoute.of(context).addLocalHistoryEntry(new LocalHistoryEntry(
       onRemove: () {
@@ -108,7 +124,13 @@ class ItemHomeState extends State<ItemHome> {
       onOpen: (Item item) {
         Navigator.pushNamed(context, '/item/${item.id}');
       },
-      onShow: null
+      onShow: null,
+      onQuantityUp: (Item item) {
+        _increaseQuantity(item);
+      },
+      onQuantityDown: (Item item) {
+        _decreaseQuantity(item);
+      }
     );
   }
 

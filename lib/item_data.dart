@@ -1,16 +1,17 @@
 import 'dart:io';
 import 'dart:async';
-import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Item {
   int id = -1;
   String name;
+  int quantity = 1;
 
   String toString() {
-    return 'id: ' + this.id.toString() + '\n' +
-           'name: ' + this.name;
+    return 'id: ${this.id}\n' +
+           'name: ${this.name}\n' +
+           'quantity: ${this.quantity}';
   }
 }
 
@@ -33,7 +34,7 @@ class Inventory {
       onCreate: (Database db, int version) async {
         print("Creating itemsDB...");
         await db.execute(
-          "CREATE TABLE Items (id INTEGER PRIMARY KEY, name TEXT)"
+          "CREATE TABLE Items (id INTEGER PRIMARY KEY, name TEXT, quantity INTEGER)"
         );
       },
     );
@@ -41,16 +42,16 @@ class Inventory {
 
   // saves a new item or updates an existing one
   static Future save(Item item) async {
-    print("Saving Item '${item.name}' to database...");
+    print("=====SAVING ITEM=====\n${item.toString()}");
     if (item.id == -1) { // insert
       await itemsDB.inTransaction(() async {
         await itemsDB.insert(
-          'INSERT INTO Items(name) VALUES(?)', [item.name]
+          'INSERT INTO Items(name, quantity) VALUES(?, ?)', [item.name, item.quantity]
         );
       });
     } else { // update
       await itemsDB.update(
-        'UPDATE Items SET name = ? WHERE id = ?', [item.name, item.id]
+        'UPDATE Items SET name = ?, quantity = ? WHERE id = ?', [item.name, item.quantity, item.id]
       );
     }
   }
@@ -60,6 +61,7 @@ class Inventory {
     Item item = new Item();
     item.id = map["id"];
     item.name = map["name"];
+    item.quantity = map["quantity"];
     return item;
   }
 
@@ -68,7 +70,6 @@ class Inventory {
     print("Getting all items from database...");
     List<Item> items = new List<Item>();
     if (itemsDB == null){
-      print("Can't find database!");
       await load();
     }
     List<Map> map = await itemsDB.query('SELECT * FROM Items');
