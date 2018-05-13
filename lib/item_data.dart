@@ -45,12 +45,12 @@ class Inventory {
     print("=====SAVING ITEM=====\n${item.toString()}");
     if (item.id == -1) { // insert
       await itemsDB.inTransaction(() async {
-        await itemsDB.insert(
+        await itemsDB.rawInsert(
           'INSERT INTO Items(name, quantity) VALUES(?, ?)', [item.name, item.quantity]
         );
       });
     } else { // update
-      await itemsDB.update(
+      await itemsDB.rawUpdate(
         'UPDATE Items SET name = ?, quantity = ? WHERE id = ?', [item.name, item.quantity, item.id]
       );
     }
@@ -72,7 +72,7 @@ class Inventory {
     if (itemsDB == null){
       await load();
     }
-    List<Map> map = await itemsDB.query('SELECT * FROM Items');
+    List<Map> map = await itemsDB.rawQuery('SELECT * FROM Items');
     for (int i = 0; i < map.length; i++) {
       items.add(_getItemFromMap(map[i]));
     }
@@ -82,13 +82,13 @@ class Inventory {
 
   // gets an item by id
   static Future<Item> get(int id) async {
-    List<Map> map = await itemsDB.query('SELECT * FROM Items WHERE id = ?', [id]);
+    List<Map> map = await itemsDB.rawQuery('SELECT * FROM Items WHERE id = ?', [id]);
     return _getItemFromMap(map[0]);
   }
 
   // deletes an item by id
   static Future delete(int id) async {
-    await itemsDB.delete(
+    await itemsDB.rawDelete(
       'DELETE FROM Items WHERE id = ?', [id]
     );
   }
