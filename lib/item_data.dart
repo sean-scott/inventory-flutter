@@ -44,11 +44,9 @@ class Inventory {
   static Future save(Item item) async {
     print("=====SAVING ITEM=====\n${item.toString()}");
     if (item.id == -1) { // insert
-      await itemsDB.inTransaction(() async {
-        await itemsDB.rawInsert(
-          'INSERT INTO Items(name, quantity) VALUES(?, ?)', [item.name, item.quantity]
-        );
-      });
+      await itemsDB.rawInsert(
+        'INSERT INTO Items(name, quantity) VALUES(?, ?)', [item.name, item.quantity]
+      );
     } else { // update
       await itemsDB.rawUpdate(
         'UPDATE Items SET name = ?, quantity = ? WHERE id = ?', [item.name, item.quantity, item.id]

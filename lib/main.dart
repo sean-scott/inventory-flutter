@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'item_data.dart';
 import 'item_home.dart';
 import 'item_page.dart';
 
@@ -31,7 +30,7 @@ class InventoryAppState extends State<InventoryApp> {
             builder: (BuildContext context) => new ItemPage(title: 'Add Item', id: -1),
           );
         } else { // old item
-          var id = int.parse(path[2], onError: (source) => null);
+          var id = int.parse(path[2]);
           if (id != null) {
             return new MaterialPageRoute<Null>(
               settings: settings,
